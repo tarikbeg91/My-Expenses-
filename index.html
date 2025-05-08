@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-key="pageTitle">खर्चों का हिसाब</title>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4; /* Light mode default */
+            color: #333; /* Light mode default text */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+            line-height: 1.6; /* Improved readability */
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background-color: #1a1a1a; /* Dark background */
+            color: #f4f4f4; /* Light text */
+        }
+
+        .container {
+            max-width: 900px; /* Increased max-width slightly */
+            margin: 20px auto;
+            background-color: #fff; /* Light mode default */
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body.dark-mode .container {
+            background-color: #333; /* Darker container */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+        }
+
+
+        /* Header Container */
+        .header-container {
+            display: flex; /* Use flexbox for alignment */
+            justify-content: space-between; /* Space out items */
+            align-items: center; /* Align items vertically */
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+             position: relative; /* Needed for absolute positioning of data menu */
+        }
+
+         /* Left side icons container */
+        .left-icons {
+            display: flex;
+            align-items: center;
+             position: relative; /* Needed for absolute positioning of data menu */
+             /* Adjust padding/margin if needed to align with right icons */
+             padding: 10px 0; /* Add vertical padding similar to right icons */
+        }
+
+         /* Right side icons container */
+        .header-icons {
+             display: flex; /* Arrange icons in a row */
+             gap: 15px; /* Space between icons */
+             padding: 10px 0; /* Add some vertical padding */
+             /* This is the right-side group (Mode, Lang) now */
+        }
+
+
+        .header-container h1 {
+            text-align: center; /* Keep text centered */
+            flex-grow: 1; /* Allow h1 to take available space */
+            margin: 0; /* Remove default h1 margin */
+            padding: 10px 0; /* Add some vertical padding */
+            color: #555; /* Light mode default */
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode .header-container h1 {
+            color: #ccc; /* Dark mode color */
+        }
+
+        .icon {
+            cursor: pointer;
+            font-size: 1.5rem; /* Icon size */
+            user-select: none; /* Prevent text selection */
+            transition: transform 0.2s ease; /* Add a small effect on click */
+            /* Optional: add tooltip attribute for hover text */
+        }
+
+         .icon:hover {
+             transform: scale(1.1); /* Slightly larger on hover */
+         }
+
+         /* Data Actions Menu (hidden initially) */
+         #dataActionsMenu {
+             position: absolute;
+             top: calc(100%); /* Position below the left icon container */
+             left: 0; /* Align to the left of the left-icons container */
+             background-color: #fff; /* Light mode default */
+             border: 1px solid #ddd; /* Light mode default */
+             border-radius: 4px;
+             padding: 10px;
+             z-index: 10; /* Ensure it's above other content */
+             display: none; /* Hidden by default */
+             flex-direction: column; /* Stack items vertically */
+             gap: 10px; /* Space between menu items */
+             min-width: 150px; /* Minimum width */
+             box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Light mode default */
+             transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+         }
+          body.dark-mode #dataActionsMenu {
+            background-color: #444; /* Darker menu */
+            border-color: #555; /* Darker border */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4); /* Darker shadow */
+          }
+
+         /* Class to show the menu */
+         #dataActionsMenu.show-menu {
+             display: flex; /* Show as flex column */
+         }
+
+         /* Style icons/items within the data menu */
+         #dataActionsMenu .menu-item {
+             cursor: pointer;
+             padding: 5px;
+             border-radius: 3px;
+             transition: background-color 0.2s ease;
+             display: flex; /* Align icon and text */
+             align-items: center;
+             gap: 8px; /* Space between icon and text */
+         }
+
+         #dataActionsMenu .menu-item:hover {
+             background-color: #f0f0f0; /* Light mode hover */
+         }
+         body.dark-mode #dataActionsMenu .menu-item:hover {
+              background-color: #555; /* Dark mode hover */
+         }
+
+         #dataActionsMenu .menu-item .icon {
+              font-size: 1.2rem; /* Slightly smaller icon in menu */
+              margin: 0; /* Remove default icon margin */
+         }
+          #dataActionsMenu .menu-item span:last-child {
+              flex-grow: 1; /* Text takes remaining space */
+              color: #333; /* Light mode default */
+              transition: color 0.3s ease;
+          }
+           body.dark-mode #dataActionsMenu .menu-item span:last-child {
+               color: #f4f4f4; /* Dark mode text */
+           }
+
+
+        /* Form Styling */
+        #expenseForm {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd; /* Light mode default */
+            border-radius: 5석px;
+            background-color: #f9f9f9; /* Light mode default */
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body.dark-mode #expenseForm {
+            background-color: #444; /* Darker form */
+            border-color: #555; /* Darker border */
+        }
+
+        /* Class to visually hide labels but keep them for screen readers */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+
+         /* General form group - used as block containers for fields */
+        .form-group {
+            margin-bottom: 15px; /* Space between form groups */
+             /* Flex properties removed - now behaves like a block by default */
+        }
+
+        /* General styling for inputs, select, and textarea (if added later) */
+        #expenseForm input[type="text"],
+        #expenseForm input[type="number"],
+        #expenseForm select,
+        #expenseForm textarea { /* Added textarea for consistency */
+            display: block; /* Make them take their own line */
+            width: 100%; /* Take full width of parent */
+            padding: 10px;
+            border: 1px solid #ccc; /* Light mode default */
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            background-color: #fff; /* Light mode default */
+            color: #333; /* Light mode default text */
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+            margin-bottom: 0; /* Remove default bottom margin */
+             min-height: 40px; /* Give a minimum height for consistency */
+        }
+
+         /* Dark mode input/select/textarea styles */
+        body.dark-mode #expenseForm input[type="text"],
+        body.dark-mode #expenseForm input[type="number"],
+        body.dark-mode #expenseForm select,
+        body.dark-mode #expenseForm textarea {
+            background-color: #555;
+            color: #f4f4f4;
+            border-color: #666;
+         }
+         body.dark-mode #expenseForm select option {
+             background-color: #555; /* Style options in dark mode */
+             color: #f4f4f4;
+         }
+
+        /* --- Styling for Category group (select + icon on same line) --- */
+        #categoryFormGroup {
+            display: flex; /* Use flexbox to align select and icon */
+            align-items: center; /* Align items vertically */
+            gap: 8px; /* Space between select and icon */
+            margin-bottom: 15px; /* Keep group bottom margin */
+        }
+
+        #categoryFormGroup select {
+            flex-grow: 1; /* Select takes remaining space */
+             /* min-height is already set above, ensures height consistency */
+        }
+
+        #addCategoryIcon {
+            display: flex; /* Use flexbox for centering '+' */
+            align-items: center; /* Center '+' vertically */
+            justify-content: center; /* Center '+' horizontally */
+            width: 40px; /* Fixed width */
+            height: 40px; /* Fixed height matching min-height of inputs/select */
+            background-color: #5cb85c; /* Green background */
+            color: white; /* White '+' symbol */
+            border: none; /* No border */
+            border-radius: 4px; /* Rounded corners */
+            cursor: pointer;
+            font-size: 1.5rem; /* Size of the '+' symbol */
+            flex-shrink: 0; /* Prevent icon from shrinking */
+            transition: background-color 0.3s ease;
+        }
+
+         body.dark-mode #addCategoryIcon {
+             background-color: #4cae4c; /* Darker green */
+         }
+         #addCategoryIcon:hover {
+             background-color: #4cae4c;
+         }
+         body.dark-mode #addCategoryIcon:hover {
+              background-color: #5cb85c;
+         }
+
+
+        /* --- End Styling for Category group --- */
+
+
+        #expenseForm button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #5cb85c; /* Default green */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #expenseForm button:hover {
+            background-color: #4cae4c;
+        }
+        /* Dark mode button adjustments if needed, maybe slightly darker green */
+        body.dark-mode #expenseForm button {
+             background-color: #4cae4c;
+        }
+        body.dark-mode #expenseForm button:hover {
+             background-color: #5cb85c;
+        }
+
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Light mode default */
+            transition: box-shadow 0.3s ease;
+            table-layout: fixed; /* Use fixed layout */
+        }
+         body.dark-mode table {
+             box-shadow: 0 2 px 5px rgba(0, 0, 0, 0.4);
+         }
+
+
+        th, td {
+            padding: 8px; /* Reduced padding */
+            text-align: left;
+            border-bottom: 1px solid #ddd; /* Light mode default */
+            transition: border-color 0.3s ease;
+            box-sizing: border-box; /* Include padding/border in width */
+            word-wrap: break-word; /* Break long words */
+            overflow-wrap: break-word; /* Modern equivalent */
+            font-size: 0.9rem; /* Smaller font size for most cells */
+        }
+         body.dark-mode th,
+         body.dark-mode td {
+             border-bottom: 1px solid #555; /* Darker border */
+         }
+
+        /* Set specific widths for columns using nth-child */
+        /* Order: Date/Time (1), Item (2), Amount (3), Category (4), Note (5), Action (6) */
+        th:nth-child(1), td:nth-child(1) { width: 110px; } /* Date/Time */
+        th:nth-child(2), td:nth-child(2) { width: 18%; } /* Item (Percentage width - Slightly reduced) */
+        th:nth-child(3), td:nth-child(3) {
+             width: 70px; /* Amount */
+             text-align: right; /* Right-align amount */
+        }
+         /* *** CATEGORY COLUMN - SMALLER FONT SIZE *** */
+        th:nth-child(4), td:nth-child(4) {
+             width: 12%; /* Category (Percentage width - Slightly reduced) */
+             font-size: 0.8rem; /* Make category text slightly smaller */
+         }
+        /* ***************************************** */
+        th:nth-child(5), td:nth-child(5) { width: auto; } /* Note (Let it take remaining space - Gets more space now) */
+        th:nth-child(6), td:nth-child(6) {
+             width: 90px; /* Action */
+             text-align: center;
+             white-space: nowrap; /* Prevent buttons from wrapping */
+        }
+
+
+        thead tr {
+            background-color: #f2f2f2; /* Light mode default */
+            color: #333; /* Light mode default */
+             transition: background-color 0.3s ease, color 0.3s ease;
+        }
+         body.dark-mode thead tr {
+             background-color: #444; /* Darker header */
+             color: #f4f4f4; /* Lighter header text */
+         }
+
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9; /* Light mode stripe */
+             transition: background-color 0.3s ease;
+        }
+         body.dark-mode tbody tr:nth-child(even) {
+             background-color: #3a3a3a; /* Dark mode stripe */
+         }
+
+        tbody tr:hover {
+            background-color: #e9e9e9; /* Light mode hover */
+             transition: background-color 0.3s ease;
+        }
+         body.dark-mode tbody tr:hover {
+             background-color: #555; /* Dark mode hover */
+         }
+
+
+        .action-buttons button {
+            padding: 4px 8px; /* Adjusted button padding */
+            margin: 0 1px; /* Adjusted button margin */
+            border: none;
+            border-radius: 3px; /* Adjusted button border-radius */
+            cursor: pointer;
+            font-size: 0.85rem; /* Adjusted button font size */
+            transition: background-color 0.2s ease;
+            display: inline-block; /* Ensure buttons are side-by-side */
+        }
+
+        .delete-btn {
+            background-color: #d9534f; /* Red */
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background-color: #c9302c;
+        }
+        /* Dark mode button adjustment if needed */
+         body.dark-mode .delete-btn {
+             background-color: #c9302c;
+         }
+          body.dark-mode .delete-btn:hover {
+             background-color: #d9534f;
+         }
+
+        /* Total Expenses Styling - REMOVED */
+
+        /* Hidden file input for import */
+        #importFile {
+            display: none;
+        }
+
+        /* --- Category Totals Styling --- */
+        #categoryTotals {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd; /* Separator line */
+             transition: border-color 0.3s ease;
+        }
+         body.dark-mode #categoryTotals {
+             border-top: 1px solid #555;
+         }
+
+        #categoryTotals h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #555; /* Light mode default */
+             transition: color 0.3s ease;
+        }
+         body.dark-mode #categoryTotals h2 {
+             color: #ccc;
+         }
+
+        #categoryTotalsList {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px; /* Space between category total items */
+        }
+
+        .category-total-item {
+            flex: 1 1 calc(50% - 5px); /* Each item takes approx 50% width with gap */
+            display: flex;
+            justify-content: space-between; /* Space out category name and amount */
+            padding: 8px 15px;
+            background-color: #e9e9e9; /* Light grey background for items */
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+             transition: background-color 0.3s ease;
+        }
+         body.dark-mode .category-total-item {
+            background-color: #555; /* Darker grey background for items */
+         }
+
+        .category-total-item span:first-child {
+            /* Category Name */
+            margin-right: 10px; /* Space between name and amount */
+            word-break: break-word; /* Break long category names */
+        }
+
+        .category-total-item span:last-child {
+            /* Total Amount */
+            white-space: nowrap; /* Prevent amount from wrapping */
+            flex-shrink: 0; /* Prevent amount from shrinking */
+            color: #333; /* Light mode text color */
+             transition: color 0.3s ease;
+        }
+        body.dark-mode .category-total-item span:last-child {
+             color: #f4f4f4; /* Dark mode text color */
+        }
+
+        #categoryTotalsList .no-expenses-message {
+             width: 100%;
+             text-align: center;
+             color: #777; /* Grey text */
+             padding: 15px;
+        }
+         body.dark-mode #categoryTotalsList .no-expenses-message {
+            color: #aaa; /* Lighter grey text */
+         }
+
+         /* --- End Category Totals Styling --- */
+
+         /* --- Filter Controls Styling --- */
+         #filterControls {
+             margin-top: 20px;
+             margin-bottom: 20px;
+             padding: 15px;
+             border: 1px solid #ddd;
+             border-radius: 5px;
+             background-color: #f9f9f9;
+             display: flex; /* Arrange controls in a row */
+             gap: 15px; /* Space between controls */
+             flex-wrap: wrap; /* Allow stacking on smaller screens */
+             align-items: center; /* Vertically align items */
+             transition: background-color 0.3s ease, border-color 0.3s ease;
+         }
+        body.dark-mode #filterControls {
+            background-color: #444;
+            border-color: #555;
+        }
+
+         #filterControls label {
+             font-weight: bold;
+             color: #333;
+             transition: color 0.3s ease;
+         }
+         body.dark-mode #filterControls label {
+             color: #f4f4f4;
+         }
+
+         #filterControls select {
+             padding: 8px;
+             border: 1px solid #ccc;
+             border-radius: 4px;
+             font-size: 1rem;
+             box-sizing: border-box;
+             background-color: #fff;
+             color: #333;
+             transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+             min-height: 40px; /* Match input/icon height */
+         }
+
+         body.dark-mode #filterControls select {
+            background-color: #555;
+            color: #f4f4f4;
+            border-color: #666;
+         }
+         body.dark-mode #filterControls select option {
+             background-color: #555;
+             color: #f4f4f4;
+         }
+        /* Adjust select widths slightly */
+         #filterControls #filterMonth {
+             flex-grow: 1; /* Allow month select to grow more */
+             min-width: 120px; /* Minimum width */
+         }
+          #filterControls #filterYear {
+             min-width: 80px; /* Minimum width */
+         }
+
+         /* --- End Filter Controls Styling --- */
+
+
+    </style>
+
+</head>
+<body>
+    <div class="container header-container">
+         <div class="left-icons">
+            <span id="optionsIcon" class="icon" title="विकल्प">⚙️</span> <div id="dataActionsMenu">
+                 <div id="importMenuItem" class="menu-item">
+                     <span class="icon">📤</span> <span data-key="menuImport">इंपोर्ट डेटा</span>
+                 </div>
+                 <div id="exportMenuItem" class="menu-item">
+                     <span class="icon">📥</span> <span data-key="menuExport">एक्सपोर्ट डेटा</span>
+                 </div>
+                 <div id="clearMenuItem" class="menu-item">
+                      <span class="icon">🗑️</span> <span data-key="menuClear">सारा डेटा साफ़ करें</span>
+                 </div>
+            </div>
+        </div>
+
+        <h1 data-key="mainTitle">मेरे खर्चे</h1>
+
+         <div class="header-icons">
+             <span id="modeToggle" class="icon" title="डार्क/लाइट मोड">🌙</span>
+             <span id="langToggle" class="icon" title="भाषा बदलें">🌐</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <form id="expenseForm">
+            <h2 data-key="formTitle">नया खर्च जोड़ें</h2>
+
+            <div class="form-group">
+                <label for="item" class="visually-hidden" data-key="labelItem">विवरण/सामान:</label> <input type="text" id="item" placeholder="जैसे: किराना, पेट्रोल" required data-key="placeholderItem">
+            </div>
+            <div class="form-group">
+                <label for="amount" class="visually-hidden" data-key="labelAmount">राशि (₹):</label> <input type="number" id="amount" placeholder="जैसे: 500" required data-key="placeholderAmount">
+            </div>
+             <div class="form-group" id="categoryFormGroup">
+                <label for="category" class="visually-hidden" data-key="labelCategory">श्रेणी:</label> <select id="category" required>
+                    <option value="" data-key="optionDefault">--श्रेणी चुनें--</option>
+                    <option value="grocery" data-key="catGrocery" selected>किराना</option> <option value="travel" data-key="catTravel">यात्रा</option> <option value="bills" data-key="catBills">बिल</option> <option value="entertainment" data-key="catEntertainment">मनोरंजन</option> <option value="food" data-key="catFood">खाना-पीना</option> <option value="other" data-key="catOther">अन्य</option> </select>
+                 <span id="addCategoryIcon" title="नई श्रेणी जोड़ें">+</span> </div>
+            <div class="form-group">
+                <label for="note" class="visually-hidden" data-key="labelNote">नोट:</label> <input type="text" id="note" placeholder="कोई अतिरिक्त जानकारी (वैकल्पिक)" data-key="placeholderNote">
+            </div>
+
+            <button type="submit" data-key="buttonAdd">खर्च जोड़ें</button>
+        </form>
+
+         <div id="filterControls">
+             <label for="filterMonth" data-key="filterLabel">दिखाएँ:</label> <select id="filterMonth"></select> <select id="filterYear"></select> </div>
+
+
+        <h2 data-key="listTitle">खर्चों की सूची</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th data-key="tableHeaderDateTime">तारीख/समय</th>
+                    <th data-key="tableHeaderItem">विवरण/सामान</th>
+                    <th data-key="tableHeaderAmount">राशि (₹)</th>
+                    <th data-key="tableHeaderCategory">श्रेणी</th>
+                    <th data-key="tableHeaderNote">नोट</th>
+                    <th data-key="tableHeaderAction">कार्यवाही</th>
+                </tr>
+            </thead>
+            <tbody id="expenseTableBody">
+                </tbody>
+        </table>
+
+         <div id="categoryTotals">
+            <h2 data-key="categoryTotalsTitle">श्रेणी के अनुसार कुल खर्च</h2>
+            <div id="categoryTotalsList">
+                </div>
+        </div>
+
+    </div>
+
+    <input type="file" id="importFile" accept=".json">
+
+    <script>
+        console.log("--- Script starts ---"); // Added log
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOMContentLoaded fired"); // Added log
+
+            // --- Element References ---
+            const body = document.body;
+            const expenseForm = document.getElementById('expenseForm');
+            const expenseTableBody = document.getElementById('expenseTableBody');
+            const categorySelect = document.getElementById('category');
+            const modeToggle = document.getElementById('modeToggle');
+            const langToggle = document.getElementById('langToggle');
+            const addCategoryIcon = document.getElementById('addCategoryIcon'); // Reference to the new icon
+            const categoryTotalsList = document.getElementById('categoryTotalsList'); // Reference to the category totals list area
+
+            // Filter Controls References
+            const filterMonthSelect = document.getElementById('filterMonth'); // Reference to the month select
+            const filterYearSelect = document.getElementById('filterYear'); // Reference to the year select
+
+            // New References for Icon Grouping
+            const optionsIcon = document.getElementById('optionsIcon'); // The new gear icon
+            const dataActionsMenu = document.getElementById('dataActionsMenu'); // The menu div
+            const importMenuItem = document.getElementById('importMenuItem'); // Import item in menu
+            const exportMenuItem = document.getElementById('exportMenuItem'); // Export item in menu
+            const clearMenuItem = document.getElementById('clearMenuItem'); // Clear item in menu
+
+
+            // Check if crucial elements are found (basic check)
+            if (!expenseForm || !expenseTableBody || !categorySelect || !modeToggle || !langToggle || !addCategoryIcon || !categoryTotalsList || !filterMonthSelect || !filterYearSelect || !optionsIcon || !dataActionsMenu || !importMenuItem || !exportMenuItem || !clearMenuItem) {
+                console.error("Error: One or more essential elements not found in the DOM. Check HTML IDs.");
+                 // Potentially add an alert to the user here
+                 alert("Application failed to initialize. Please check console for details.");
+                 console.log("--- Script stopped due to missing elements ---"); // Added log
+                 return; // Stop script execution if elements are missing
+            }
+            console.log("Essential element references obtained successfully."); // Added log
+
+
+            // New Hidden File Input Reference
+            const importFile = document.getElementById('importFile');
+             if (!importFile) {
+                  console.warn("Warning: importFile element not found. Import feature may not work.");
+             }
+
+
+            // Elements that need translation
+            // Updated to include new menu item text
+            const translatableElements = document.querySelectorAll('[data-key]:not(option)');
+            // Translatable predefined options
+            const translatableOptions = document.querySelectorAll('#category option[data-key]');
+
+            // Global variables for currently selected filter month and year
+            let selectedMonth; // 0-indexed (0 for Jan, 11 for Dec) or special values like 'all'
+            let selectedYear; // Full year (e.g., 2023) or special values like 'all'
+
+
+            // --- Data Arrays ---
+            let expenses = []; // Array to store ALL expense objects
+            let customCategories = []; // Array to store custom categories
+
+            // --- Translations Object ---
+            const translations = {
+                hi: {
+                    pageTitle: 'खर्चों का हिसाब',
+                    mainTitle: 'मेरे खर्चे',
+                    formTitle: 'नया खर्च जोड़ें',
+                    labelItem: 'विवरण/सामान:',
+                    labelAmount: 'राशि (₹):',
+                    labelCategory: 'श्रेणी:',
+                    labelNote: 'नोट:',
+                    placeholderItem: 'जैसे: किराना, पेट्रोल',
+                    placeholderAmount: 'जैसे: 500',
+                    placeholderNote: 'कोई अतिरिक्त जानकारी (वैकल्पिक)',
+                    buttonAdd: 'खर्च जोड़ें',
+                    listTitle: 'खर्चों की सूची',
+                    tableHeaderDateTime: 'तारीख/समय',
+                    tableHeaderItem: 'विवरण/सामान',
+                    tableHeaderAmount: 'राशि (₹)',
+                    tableHeaderCategory: 'श्रेणी',
+                    tableHeaderNote: 'नोट',
+                    tableHeaderAction: 'कार्यवाही',
+                    buttonDelete: 'हटाएँ',
+                    optionDefault: '--श्रेणी चुनें--',
+                    catGrocery: 'किराना',
+                    catTravel: 'यात्रा',
+                    catBills: 'बिल',
+                    catEntertainment: 'मनोरंजन',
+                    catFood: 'खाना-पीना',
+                    catOther: 'अन्य',
+                    alertAmountInvalid: 'कृपया राशि सही फॉर्मेट में डालें (एक पॉजिटिव संख्या)।',
+                    alertCategoryEmpty: ' कृपया श्रेणी चुनें।',
+                    alertItemEmpty: ' कृपया विवरण/सामान भरें।',
+                    confirmDelete: 'क्या आप वाकई यह खर्च हटाना चाहते हैं?', // Confirmation text
+                    loadError: 'पिछला डेटा लोड नहीं हो सका। डेटा रीसेट कर दिया गया है।', // Load error message
+                    // New Translations
+                    confirmClear: 'क्या आप वाकई सारा खर्च डेटा साफ़ करना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।',
+                    dataCleared: 'सारा खर्च डेटा साफ़ कर दिया गया है।',
+                    exportFileName: 'mere_kharche', // Default filename without extension
+                    exportSuccess: 'डेटा सफलतापूर्वक JSON फ़ाइल के रूप में एक्सपोर्ट किया गया।',
+                    exportError: 'डेटा एक्सपोर्ट करते समय कोई त्रुटि हुई।',
+                    importSuccess: 'डेटा सफलतापूर्वक इंपोर्ट किया गया।',
+                    importError: 'डेटा इंपोर्ट करते समय कोई त्रुटि हुई। कृपया सुनिश्चित करें कि यह एक वैध JSON फ़ाइल है।',
+                    importInvalidData: 'अमान्य डेटा फ़ाइल। कृपया एक वैध खर्चों की JSON फ़ाइल चुनें।',
+                    promptNewCategory: 'नई श्रेणी का नाम दर्ज करें:', // Prompt for new category
+                    alertCategoryExists: 'यह श्रेणी पहले से मौजूद है।', // Category already exists
+                    alertCategoryInvalid: 'श्रेणी का नाम खाली नहीं हो सकता।', // Empty category name
+                    categoryTotalsTitle: 'श्रेणी के अनुसार कुल खर्च', // New translation key for total title
+                    noExpensesMessage: 'कोई खर्च दर्ज नहीं किया गया।', // Message when no expenses
+                    filterLabel: 'दिखाएँ:', // Filter label translation
+                    filterOptionAll: 'सभी', // Filter option for all data
+                    monthNames: [ // Month names for filter dropdown (0-indexed)
+                         'जनवरी', 'फरवरी', 'मार्च', 'अप्रैल', 'मई', 'जून',
+                         'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर'
+                    ],
+                    // Specific no expenses messages
+                     monthSpecificNoExpenses: 'में कोई खर्च नहीं मिला।',
+                     yearSpecificNoExpenses: 'में कोई खर्च नहीं मिला।',
+                    // Menu item translations
+                     menuImport: 'इंपोर्ट डेटा',
+                     menuExport: 'एक्सपोर्ट डेटा',
+                     menuClear: 'सारा डेटा साफ़ करें',
+                     optionsIconTitle: 'विकल्प' // Tooltip for the new options icon
+                },
+                en: {
+                    pageTitle: 'Expense Tracker',
+                    mainTitle: 'My Expenses',
+                    formTitle: 'Add New Expense',
+                    labelItem: 'Description/Item:',
+                    labelAmount: 'Amount (₹):',
+                    labelCategory: 'Category:',
+                    labelNote: 'Note:',
+                    placeholderItem: 'e.g., Groceries, Fuel',
+                    placeholderAmount: 'e.g., 500',
+                    placeholderNote: 'Any additional info (optional)',
+                    buttonAdd: 'Add Expense',
+                    listTitle: 'Expense List',
+                    tableHeaderDateTime: 'Date/Time',
+                    tableHeaderItem: 'Description/Item:',
+                    tableHeaderAmount: 'Amount (₹)',
+                    tableHeaderCategory: 'Category:',
+                    tableHeaderNote: 'Note:',
+                    tableHeaderAction: 'Action',
+                    buttonDelete: 'Delete',
+                    optionDefault: '--Select Category--',
+                    catGrocery: 'Grocery',
+                    catTravel: 'Travel',
+                    catBills: 'Bills',
+                    catEntertainment: 'Entertainment',
+                    catFood: 'Food',
+                    catOther: 'Other',
+                     alertAmountInvalid: 'Please enter a valid amount (a positive number).',
+                     alertCategoryEmpty: 'Please select a category.',
+                     alertItemEmpty: 'Please enter item description.',
+                     confirmDelete: 'Are you sure you want to delete this expense?', // Confirmation text
+                     loadError: 'Previous data could not be loaded. Data has been reset.', // Load error message
+                     // New Translations
+                     confirmClear: 'Are you sure you want to clear all expense data? This action cannot be undone.',
+                     dataCleared: 'All expense data has been cleared.',
+                     exportFileName: 'my_expenses', // Default filename without extension
+                     exportSuccess: 'Data successfully exported.',
+                     exportError: 'An error occurred during export.',
+                     importSuccess: 'Data successfully imported.',
+                     importError: 'Data processing error. Please check the file format.',
+                     importInvalidData: 'Invalid data file. Please select a valid expenses JSON file.',
+                     promptNewCategory: 'Enter new category name:', // Prompt for new category
+                     alertCategoryExists: 'This category already exists.', // Category already exists
+                     alertCategoryInvalid: 'Category name cannot be empty.', // Empty category name
+                     categoryTotalsTitle: 'Total Expenses by Category', // New translation key for total title
+                     noExpensesMessage: 'No expenses recorded.', // Message when no expenses
+                     filterLabel: 'Show:', // Filter label translation
+                     filterOptionAll: 'All', // Filter option for all data
+                     monthNames: [ // Month names for filter dropdown (0-indexed)
+                         'January', 'February', 'March', 'April', 'May', 'June',
+                         'July', 'August', 'September', 'October', 'November', 'December'
+                     ],
+                     // Specific no expenses messages
+                     monthSpecificNoExpenses: ' no expenses found.', // e.g., "May no expenses found."
+                     yearSpecificNoExpenses: ' no expenses found.', // e.g., "2024 no expenses found."
+                     // Menu item translations
+                     menuImport: 'Import Data',
+                     menuExport: 'Export Data',
+                     menuClear: 'Clear All Data',
+                     optionsIconTitle: 'Options' // Tooltip for the new options icon
+                }
+            };
+
+            // Helper function to format date and time
+            function formatDateTime(date) {
+                const year = date.getFullYear();
+                const month = ('0' + (date.getMonth() + 1)).slice(-2);
+                const day = ('0' + date.getDate()).slice(-2);
+                const hours = ('0' + date.getHours()).slice(-2);
+                const minutes = ('0' + date.getMinutes()).slice(-2);
+                const seconds = ('0' + date.getSeconds()).slice(-2);
+                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+            }
+
+            // --- Local Storage Functions ---
+
+            // Save expenses array to Local Storage
+            function saveExpensesToLocalStorage() {
+                try {
+                    localStorage.setItem('expenses', JSON.stringify(expenses));
+                     console.log("Expenses saved to Local Storage."); // Added log
+                } catch (e) {
+                    console.error('Error saving expenses to Local Storage:', e); // Improved error log
+                    // In a real app, you might inform the user here
+                }
+            }
+
+            // Save custom categories array to Local Storage
+            function saveCustomCategories() {
+                try {
+                    // Get values from options that don't have data-key (these are custom)
+                    const currentCustomCategories = [];
+                    categorySelect.querySelectorAll('option').forEach(option => {
+                        // Only save options that don't have a data-key AND have a value (not the empty default)
+                        if (!option.hasAttribute('data-key') && option.value !== '') {
+                            currentCustomCategories.push(option.value); // Save the value (the category name)
+                        }
+                    });
+                    localStorage.setItem('customCategories', JSON.stringify(currentCustomCategories));
+                    console.log("Custom categories saved:", currentCustomCategories); // Added log
+                } catch (e) {
+                    console.error('Error saving custom categories to Local Storage:', e); // Improved error log
+                }
+            }
+
+            // Load custom categories from Local Storage and add to select
+            function loadCustomCategories() {
+                console.log("Attempting to load custom categories..."); // Added log
+                const storedCustomCategories = localStorage.getItem('customCategories');
+
+                // Clear existing custom options from the select (keep data-key options)
+                 categorySelect.querySelectorAll('option').forEach(option => {
+                    if (!option.hasAttribute('data-key')) { // If it doesn't have data-key, it's custom or the default empty option
+                        // Keep the default empty option, remove others
+                        if (option.value !== '') {
+                            option.remove();
+                        }
+                    }
+                 });
+                 console.log("Cleared existing custom options from select."); // Added log
+
+
+                if (storedCustomCategories) {
+                    try {
+                        customCategories = JSON.parse(storedCustomCategories);
+                         if (!Array.isArray(customCategories)) {
+                             console.error('Local Storage custom categories data is not an array, clearing.'); // Improved error log
+                             customCategories = [];
+                             localStorage.removeItem('customCategories'); // Clear bad data
+                         }
+                         console.log("Loaded custom categories from storage:", customCategories); // Added log
+
+                        // Add loaded custom categories to the select box
+                        customCategories.forEach(category => {
+                            // Check if category already exists (predefined or just added) - case-insensitive check
+                             if (category && typeof category === 'string' && category.trim() !== '' && !Array.from(categorySelect.options).some(opt => opt.value.toLowerCase() === category.toLowerCase())) {
+                                addCategoryToSelect(category.trim()); // Use helper to add option, trim whitespace
+                             } else if (category) {
+                                console.warn(`Skipping duplicate or invalid custom category "${category}" from storage.`); // Improved log
+                             }
+                        });
+                        console.log("Added loaded custom categories to select."); // Added log
+
+
+                    } catch (e) { // Catch parsing errors
+                        console.error('Error parsing Local Storage custom categories data:', e); // Improved error log
+                        customCategories = [];
+                         localStorage.removeItem('customCategories'); // Clear the bad data
+                    }
+                } else {
+                    customCategories = []; // Initialize as empty if nothing in storage
+                     console.log("No custom categories found in Local Storage."); // Added log
+                }
+                 // applyLanguage is called AFTER loadCustomCategories in the DOMContentLoaded block
+            }
+
+
+            // Load expense data from Local Storage
+            // This function now only loads and returns expenses, it does NOT load custom categories or render the table
+            function loadExpensesFromLocalStorage() {
+                 console.log("Attempting to load expenses from Local Storage..."); // Added log
+
+                const storedExpenses = localStorage.getItem('expenses');
+                if (storedExpenses) {
+                    try {
+                        expenses = JSON.parse(storedExpenses);
+                         // Ensure expenses is actually an array after parsing and filter out obviously invalid entries
+                         if (!Array.isArray(expenses)) {
+                             console.error('Local Storage data is not an array, clearing.'); // Improved error log
+                             expenses = [];
+                             localStorage.removeItem('expenses'); // Clear bad data
+                         } else {
+                             // Filter out items missing essential properties or with invalid dates/amounts
+                              const validExpenses = expenses.filter(item =>
+                                             item && typeof item === 'object' &&
+                                             typeof item.id !== 'undefined' &&
+                                             typeof item.dateTime === 'string' && // Date string check
+                                             typeof item.item === 'string' &&
+                                             typeof item.amount === 'number' && item.amount > 0 && // Amount check
+                                             typeof item.category !== 'undefined' && typeof item.category === 'string' && item.category.trim() !== '' && // Category check
+                                             typeof item.note !== 'undefined' // Check for existence
+                                          );
+                             if(validExpenses.length !== expenses.length) {
+                                 console.warn(`Filtered out ${expenses.length - validExpenses.length} invalid expense entries during load.`);
+                                 expenses = validExpenses; // Update expenses to only include valid ones
+                                 // Optionally save the cleaned data back immediately
+                                 // saveExpensesToLocalStorage();
+                             }
+                         }
+
+
+                         console.log("Loaded valid expenses from storage:", expenses); // Added log
+
+                         // Sort by date/time descending (newest first) immediately after loading
+                         expenses.sort((a, b) => {
+                             // Add basic validation for date objects during sort
+                             const dateA = a && typeof a.dateTime === 'string' ? new Date(a.dateTime) : null;
+                             const dateB = b && typeof b.dateTime === 'string' ? new Date(b.dateTime) : null;
+
+                              if (!dateA && !dateB) return 0; // Both invalid
+                              if (!dateA) return 1; // a is invalid, b comes first
+                              if (!dateB) return -1; // b is invalid, a comes first
+
+                             return dateB.getTime() - dateA.getTime(); // Standard sort using time values
+                         });
+                         console.log("Expenses sorted after loading."); // Added log
+
+
+                        return expenses; // Return the loaded and sorted expenses array
+
+                    } catch (e) { // Catch parsing errors
+                        console.error('Error parsing Local Storage data:', e); // Improved error log
+                        // If parsing fails, clear the bad data and start fresh
+                        expenses = [];
+                        localStorage.removeItem('expenses'); // Clear the bad data
+                        alert(translations[currentLang]?.loadError || 'पिछला डेटा लोड नहीं हो सका। डेटा रीसेट कर दिया गया है।'); // Use translation if available
+                        return []; // Return empty array on error
+                    }
+                } else {
+                    expenses = []; // Initialize as empty if nothing in storage
+                     console.log("No expenses found in Local Storage."); // Added log
+                     return []; // Return empty array
+                }
+            }
+
+             // Function to render the expense table from a given array of expenses
+             function renderExpenseTable(expensesToRender) {
+                 console.log(`Rendering expense table with ${expensesToRender.length} expenses...`); // Added log
+                 // Clear the current table body before rendering
+                 if (expenseTableBody) expenseTableBody.innerHTML = '';
+                 else { console.error("expenseTableBody not found for rendering."); return; }
+                 console.log("Expense table body cleared."); // Added log
+
+
+                 // Add each expense to the table
+                 if (expensesToRender.length > 0) {
+                      expensesToRender.forEach(expense => {
+                         // Basic validation before attempting to add row
+                         try { // Add try-catch around individual row rendering
+                              if (expense && typeof expense.id !== 'undefined' && typeof expense.dateTime === 'string' && typeof expense.item === 'string' && typeof expense.amount === 'number' && typeof expense.category === 'string') {
+                                 addExpenseRowToTable(expense); // Use a separate function for adding HTML row
+                              } else {
+                                 console.warn('Skipping invalid expense data from array during rendering:', expense); // Improved log
+                              }
+                         } catch (e) {
+                             console.error('Error rendering expense row:', expense, e); // Log error for specific row
+                         }
+                      });
+                     console.log(`Added ${expensesToRender.length} rows to the table.`); // Added log
+                 } else {
+                     console.log("No expenses to render in the table."); // Added log
+                     // Optionally display a "no data" row in the table itself
+                     // For now, leave it empty if no expenses match the filter
+                 }
+
+
+                 // Update delete button text after rendering (redundant if applyLanguage calls render, but safe)
+                 // applyLanguage(currentLang); // No longer needed here as applyLanguage calls renderTable/Totals
+             }
+
+             // Function to calculate and render category totals from a given array of expenses
+             function renderCategoryTotals(expensesToRender) {
+                 console.log("Rendering category totals..."); // Added log
+                 const totals = {};
+
+                 // 1. Calculate Totals per Category
+                 expensesToRender.forEach(expense => {
+                     const category = expense.category; // Use the stored value (language-neutral or manual name)
+                     const amount = expense.amount;
+
+                     if (category && typeof amount === 'number' && amount > 0) {
+                         if (totals[category]) {
+                             totals[category] += amount;
+                         } else {
+                             totals[category] = amount;
+                         }
+                     } else if (expense) {
+                         console.warn('Skipping expense with invalid category or amount for totals calculation:', expense); // Added log
+                     }
+                 });
+
+                 // 2. Prepare Data for Display (sort categories alphabetically)
+                 const sortedCategories = Object.keys(totals).sort();
+
+                 // 3. Render the Totals
+                 if (categoryTotalsList) categoryTotalsList.innerHTML = '';
+                 else { console.error("categoryTotalsList not found for rendering totals."); return; }
+                 console.log("Category totals list area cleared."); // Added log
+
+
+                 if (sortedCategories.length === 0) {
+                     // Display message if no expenses match the filter
+                     const noExpensesMsg = document.createElement('div');
+                     noExpensesMsg.classList.add('no-expenses-message');
+                     // Use selectedMonth and selectedYear to make message more specific if not "All"
+                     let messageText = translations[currentLang]?.noExpensesMessage || translations.en.noExpensesMessage || 'No expenses recorded.';
+                      if (selectedMonth !== 'all' || selectedYear !== 'all') {
+                           // Attempt to create a more specific message if filtering
+                           const monthText = selectedMonth === 'all' ? (translations[currentLang]?.filterOptionAll || translations.en.filterOptionAll || 'All') : (translations[currentLang]?.monthNames[parseInt(selectedMonth)] || translations.en.monthNames[parseInt(selectedMonth)] || `Month ${parseInt(selectedMonth) + 1}`);
+                           const yearText = selectedYear === 'all' ? (translations[currentLang]?.filterOptionAll || translations.en.filterOptionAll || 'All') : selectedYear;
+
+                           // Build the message using string interpolation with fallbacks
+                            if (selectedMonth !== 'all' && selectedYear !== 'all') {
+                                // e.g., "जनवरी 2020 में कोई खर्च नहीं मिला।"
+                                messageText = `${monthText} ${yearText} ${translations[currentLang]?.['monthSpecificNoExpenses'] || translations.en['monthSpecificNoExpenses'] || 'में कोई खर्च नहीं मिला।'}`; // Added placeholder key
+                            } else if (selectedMonth !== 'all') {
+                                // e.g., "जनवरी में कोई खर्च नहीं मिला।"
+                                messageText = `${monthText} ${translations[currentLang]?.['monthSpecificNoExpenses'] || translations.en['monthSpecificNoExpenses'] || 'में कोई खर्च नहीं मिला।'}`; // Added placeholder key
+                           } else if (selectedYear !== 'all') {
+                                // e.g., "2020 में कोई खर्च नहीं मिला।"
+                                messageText = `${yearText} ${translations[currentLang]?.['yearSpecificNoExpenses'] || translations.en['yearSpecificNoExpenses'] || 'में कोई खर्च नहीं मिला।'}`; // Added placeholder key
+                           } else {
+                               // Fallback to generic "No expenses recorded" message
+                               messageText = translations[currentLang]?.noExpensesMessage || translations.en.noExpensesMessage || 'No expenses recorded.';
+                           }
+                     } else {
+                          // Fallback to generic "No expenses recorded" message if "All" is selected for both
+                          messageText = translations[currentLang]?.noExpensesMessage || translations.en.noExpensesMessage || 'No expenses recorded.';
+                     }
+
+                     noExpensesMsg.textContent = messageText;
+
+                     categoryTotalsList.appendChild(noExpensesMsg);
+                     console.log("Displayed 'No expenses recorded' message in totals."); // Added log
+                 } else {
+                      sortedCategories.forEach(categoryValue => {
+                         const totalAmount = totals[categoryValue];
+
+                         // Get the display text for the category (translated if predefined, or manual name)
+                         const optionElement = categorySelect.querySelector(`option[value="${categoryValue}"]`);
+                         const categoryDisplayText = optionElement ? optionElement.textContent : categoryValue; // Fallback to value
+
+                         const totalItem = document.createElement('div');
+                         totalItem.classList.add('category-total-item');
+
+                         const categorySpan = document.createElement('span');
+                         categorySpan.textContent = categoryDisplayText;
+                         totalItem.appendChild(categorySpan);
+
+                         const amountSpan = document.createElement('span');
+                         // Format the amount - use ₹ and two decimal places
+                         amountSpan.textContent = `₹ ${totalAmount.toFixed(2)}`;
+                         totalItem.appendChild(amountSpan);
+
+                         categoryTotalsList.appendChild(totalItem);
+                      });
+                     console.log(`Displayed totals for ${sortedCategories.length} categories.`); // Added log
+                 }
+                 console.log("Category totals rendering complete."); // Added log
+             }
+
+
+            // --- Functions ---
+
+            // Apply Dark/Light Mode
+            function applyMode(mode) {
+                 console.log(`Applying mode: ${mode}`); // Added log
+                if (body) {
+                    if (mode === 'dark') {
+                        body.classList.add('dark-mode');
+                        if (modeToggle) modeToggle.textContent = '☀️'; // Sun icon for dark mode
+                        localStorage.setItem('expenseTrackerMode', 'dark');
+                    } else {
+                        body.classList.remove('dark-mode');
+                        if (modeToggle) modeToggle.textContent = '🌙'; // Moon icon for light mode
+                        localStorage.setItem('expenseTrackerMode', 'light');
+                    }
+                    currentMode = mode;
+                } else {
+                    console.error("Body element not found for applying mode."); // Added error log
+                }
+            }
+
+            // Apply Language
+            // This function now also triggers re-rendering after translation
+            function applyLanguage(lang) {
+                 console.log(`Applying language: ${lang}`); // Added log
+                 // Ensure translations object exists for the language
+                 if (!translations[lang]) {
+                     console.error(`Translations missing for language: ${lang}`); // Improved error log
+                     // Fallback to a default or prevent changing? For now, just log and exit.
+                     return;
+                 }
+
+                translatableElements.forEach(element => {
+                    const key = element.getAttribute('data-key');
+                    if (translations[lang] && translations[lang][key]) { // Added translations[lang] check
+                        if (element.tagName === 'INPUT' && element.hasAttribute('placeholder')) {
+                             element.placeholder = translations[lang][key];
+                        } else {
+                           element.textContent = translations[lang][key];
+                        }
+                    } else {
+                         console.warn(`Missing translation for key: ${key} in language: ${lang}`); // Improved log
+                    }
+                });
+                console.log("Non-option elements translated."); // Added log
+
+
+                // Translate only options that have the data-key attribute (predefined ones)
+                translatableOptions.forEach(option => {
+                     const key = option.getAttribute('data-key');
+                      if (translations[lang] && translations[lang][key]) { // Added translations[lang] check
+                         option.textContent = translations[lang][key];
+                      } else {
+                         console.warn(`Missing translation for option key: ${key} in language: ${lang}`); // Improved log
+                      }
+                });
+                console.log("Predefined options translated."); // Added log
+
+                 // Populate Month dropdown with translated names
+                 populateMonthDropdown(lang); // This uses currentLang, ensure it's updated before this call
+                 console.log("Month dropdown re-populated with translated names."); // Added log
+
+
+                // Update header translations
+                 const categoryTotalsTitleElement = document.querySelector('#categoryTotals h2');
+                 if (categoryTotalsTitleElement) {
+                     const key = categoryTotalsTitleElement.getAttribute('data-key');
+                     categoryTotalsTitleElement.textContent = translations[lang]?.[key] || categoryTotalsTitleElement.textContent; // Use optional chaining
+                 }
+                 const filterLabelElement = document.querySelector('#filterControls label[data-key="filterLabel"]');
+                 if (filterLabelElement) {
+                     const key = filterLabelElement.getAttribute('data-key');
+                     filterLabelElement.textContent = translations[lang]?.[key] || filterLabelElement.textContent; // Use optional chaining
+                 }
+                 const optionsIconElement = document.getElementById('optionsIcon');
+                 if (optionsIconElement) {
+                     optionsIconElement.title = translations[lang]?.optionsIconTitle || optionsIconElement.title;
+                 }
+
+                // Update menu item translations
+                 if (importMenuItem) {
+                     const key = importMenuItem.querySelector('span:last-child')?.getAttribute('data-key');
+                     if (key) importMenuItem.querySelector('span:last-child').textContent = translations[lang]?.[key] || importMenuItem.querySelector('span:last-child').textContent;
+                 }
+                 if (exportMenuItem) {
+                     const key = exportMenuItem.querySelector('span:last-child')?.getAttribute('data-key');
+                     if (key) exportMenuItem.querySelector('span:last-child').textContent = translations[lang]?.[key] || exportMenuItem.querySelector('span:last-child').textContent;
+                 }
+                  if (clearMenuItem) {
+                     const key = clearMenuItem.querySelector('span:last-child')?.getAttribute('data-key');
+                     if (key) clearMenuItem.querySelector('span:last-child').textContent = translations[lang]?.[key] || clearMenuItem.querySelector('span:last-child').textContent;
+                 }
+
+
+                console.log("Header and menu item translations updated."); // Added log
+
+
+                // Ensure translation exists before setting title
+                document.title = translations[lang]?.pageTitle || 'Expense Tracker'; // Use optional chaining
+
+
+                localStorage.setItem('expenseTrackerLang', lang);
+                currentLang = lang; // Update global language variable
+
+
+                 // Show flag of the language you can switch TO
+                 if (langToggle) langToggle.textContent = (lang === 'hi' ? '🇬🇧' : '🇮🇳');
+
+
+                 document.documentElement.lang = lang;
+
+                 // After changing language, re-render table and category totals to apply translations
+                 // This is crucial for updating displayed category names and delete button text
+                 // Do NOT call updateDisplayedData here directly. Let the filter change listener handle it
+                 // or ensure it's called once after initial filter setting in DOMContentLoaded.
+                 // The DOMContentLoaded sequence now handles the initial render after language is set and filters are set.
+                 console.log("Language applied. Rendering will be triggered by filter setup."); // Added log
+
+            }
+
+            // Function to add a SINGLE expense OBJECT's row to the table (used by render)
+            // This function assumes 'expense' is a valid object structure and categorySelect is populated
+            function addExpenseRowToTable(expense) {
+                 if (!expenseTableBody) {
+                     console.error("expenseTableBody element not found for adding row.");
+                     return; // Prevent error if tbody is missing
+                 }
+                 try { // Add try-catch around row insertion
+                     const newRow = expenseTableBody.insertRow();
+                     newRow.dataset.id = expense.id; // Link row to data using id
+
+                     const dateTimeCell = newRow.insertCell(0);
+                     dateTimeCell.textContent = expense.dateTime;
+
+                     const itemCell = newRow.insertCell(1);
+                     itemCell.textContent = expense.item;
+
+                     const amountCell = newRow.insertCell(2);
+                     amountCell.textContent = expense.amount.toFixed(2); // Format amount
+                     amountCell.style.textAlign = 'right'; // Ensure amount stays right-aligned
+
+                     const categoryCell = newRow.insertCell(3);
+                      // Display category text based on the saved value and current language
+                      const savedCategoryValue = expense.category;
+                      // Find the option element in the CURRENT categorySelect based on its value
+                      // Need to ensure categorySelect is populated *before* rendering
+                      let categoryDisplayText = savedCategoryValue; // Default to raw value
+                       if (categorySelect) { // Add check for categorySelect
+                          const optionElement = categorySelect.querySelector(`option[value="${savedCategoryValue}"]`);
+                           if (optionElement) {
+                               // If an option with this value exists in the current select (translated or custom)
+                               categoryDisplayText = optionElement.textContent;
+                           } else {
+                               console.warn(`Category value "${savedCategoryValue}" from expense data not found in current select options. Displaying raw value.`); // Improved log
+                           }
+                       } else {
+                           console.warn("categorySelect element not found during row rendering. Displaying raw category value."); // Added log
+                       }
+                      categoryCell.textContent = categoryDisplayText;
+
+
+                     const noteCell = newRow.insertCell(4);
+                     noteCell.textContent = expense.note;
+
+                     const actionCell = newRow.insertCell(5);
+                     actionCell.classList.add('action-buttons');
+
+                     const deleteButton = document.createElement('button');
+                     // Use current language for button text when creating the row
+                     // Ensure translation exists before setting
+                     deleteButton.textContent = translations[currentLang]?.buttonDelete || translations.en.buttonDelete || 'Delete'; // Use optional chaining here too
+                     deleteButton.classList.add('delete-btn');
+
+                     // Add delete event listener directly to the button when it's created
+                     deleteButton.addEventListener('click', function() {
+                          console.log('Delete button clicked for ID:', expense.id); // Added log
+                          // Optional: Add confirm before deleting
+                          if (confirm(translations[currentLang]?.confirmDelete || translations.en.confirmDelete || 'Are you sure?')) { // Use optional chaining with fallback confirm text
+                              console.log('User confirmed deletion.'); // Added log
+                             const rowToRemove = this.closest('tr'); // Find the parent row
+                             // Check if rowToRemove and dataset.id exist before trying to parse
+                             const expenseId = rowToRemove && rowToRemove.dataset.id ? parseInt(rowToRemove.dataset.id) : null;
+
+                             if (expenseId === null) {
+                                 console.error("Could not determine expense ID from row for deletion."); // Added error log
+                                 return; // Exit if ID is missing
+                             }
+
+                             try { // Add try-catch around deletion logic
+                                 // Remove from expenses array - filter creates a new array
+                                 expenses = expenses.filter(exp => exp.id !== expenseId); // Use strict inequality
+
+                                 // Remove from HTML table (this row only)
+                                 rowToRemove.remove();
+
+                                 // Save updated array to Local Storage
+                                 saveExpensesToLocalStorage();
+
+                                 // Update category totals (will automatically re-filter and re-render totals)
+                                 // No need to call updateDisplayedData here, just render totals
+                                 renderCategoryTotals(filterExpensesByMonthYear(expenses, selectedMonth, selectedYear)); // Recalculate totals for the *current* filter
+
+                                 console.log(`Expense with ID ${expenseId} deleted.`); // Added log
+
+                             } catch (e) {
+                                 console.error(`Error during deletion of expense ID ${expenseId}:`, e); // Added error log
+                                 alert("Error deleting expense."); // Inform user
+                             }
+
+
+                          } else {
+                              console.log('User cancelled deletion.'); // Added log
+                          }
+                     });
+
+                     actionCell.appendChild(deleteButton);
+                      console.log(`Row added for expense ID ${expense.id}`); // Added log
+
+                 } catch (e) {
+                     console.error('FATAL Error adding expense row to table:', expense, e); // Added error log
+                     // If adding a row consistently fails, something is very wrong.
+                     // Decide if you want to stop or try to continue. Logging is essential.
+                 }
+
+                // Row is added to tbody by renderExpenseTable
+            }
+
+
+             // Function to add a new category to the select dropdown
+             function addCategoryToSelect(categoryName) {
+                 if (!categorySelect) {
+                      console.error("categorySelect element not found for adding category.");
+                     return null; // Prevent error
+                 }
+                 // Check if category already exists (case-insensitive check before adding the option element)
+                 // Find by value first
+                 const categoryExistsByValue = Array.from(categorySelect.options).some(option =>
+                     option.value.toLowerCase() === categoryName.toLowerCase()
+                 );
+                 // Optionally, check if the translated text of a predefined category matches the new name
+                 // (Less common check, usually relying on unique values is sufficient)
+                 // const categoryExistsByText = Array.from(categorySelect.options).some(option =>
+                 //     option.textContent.toLowerCase() === categoryName.toLowerCase() && option.value !== categoryName
+                 // );
+
+                 if (categoryExistsByValue) { // || categoryExistsByText) {
+                      console.warn(`Attempted to add duplicate category "${categoryName}" to select.`); // Improved log
+                     return null; // Indicate that it was not added
+                 }
+
+                 const option = document.createElement('option');
+                 option.value = categoryName; // Value and text content are the manual name
+                 option.textContent = categoryName;
+                 categorySelect.appendChild(option);
+                 console.log(`Added category "${categoryName}" to select.`); // Added log
+                 return option; // Return the added option
+             }
+
+
+            // --- New Functions: Export, Import, Clear, Add Category, Filtering ---
+
+            function exportData() {
+                console.log("Exporting data..."); // Added log
+                 hideDataActionsMenu(); // Hide the menu
+                try {
+                    // Export expenses array and custom categories array
+                    const dataToExport = {
+                        expenses: expenses, // Export ALL expenses, not just filtered ones
+                        customCategories: customCategories // Export custom categories too
+                    };
+
+                    const data = JSON.stringify(dataToExport, null, 2); // Beautify JSON output
+                    const blob = new Blob([data], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+
+                    const a = document.createElement('a');
+                    a.href = url;
+                    // Use translation for filename
+                    const filename = translations[currentLang]?.exportFileName || 'my_expenses';
+                    a.download = `${filename}_${new Date().toISOString().slice(0,10)}.json`; // Add date to filename
+                    document.body.appendChild(a); // Append to trigger download
+                    a.click(); // Trigger the download
+                    document.body.removeChild(a); // Clean up
+                    URL.revokeObjectURL(url); // Clean up the URL object
+
+                    alert(translations[currentLang]?.exportSuccess || translations.en.exportSuccess || 'Data successfully exported.');
+                    console.log("Export successful."); // Added log
+
+                } catch (e) {
+                    console.error('Export failed:', e); // Improved error log
+                    alert(translations[currentLang]?.exportError || translations.en.exportError || 'An error occurred during export.');
+                }
+            }
+
+             function importData(file) {
+                 console.log("Importing data..."); // Added log
+                 hideDataActionsMenu(); // Hide the menu
+                 if (!file) {
+                      console.log("Import cancelled: No file selected."); // Added log
+                     return; // No file selected
+                 }
+
+                 const reader = new FileReader();
+
+                 reader.onload = (event) => {
+                     console.log("File read complete."); // Added log
+                     try {
+                         console.log("Attempting to parse JSON..."); // Added log
+                         const importedData = JSON.parse(event.target.result);
+                         console.log("JSON parsed.", importedData); // Added log
+
+                         // Basic validation: Check if it has 'expenses' and optionally 'customCategories' arrays
+                         const isValid = importedData && typeof importedData === 'object' &&
+                                         Array.isArray(importedData.expenses) &&
+                                         (!importedData.customCategories || Array.isArray(importedData.customCategories));
+
+                         if (isValid) {
+                             console.log("Imported data structure is valid. Processing..."); // Added log
+                             // Optional: Validate individual expense objects further if needed
+                             const validExpenses = importedData.expenses.filter(item =>
+                                             item && typeof item === 'object' &&
+                                             typeof item.id !== 'undefined' && // Check for existence
+                                             typeof item.dateTime === 'string' && // Check type
+                                             typeof item.item === 'string' &&
+                                             typeof item.amount === 'number' && item.amount > 0 && // Check type and value
+                                             typeof item.category !== 'undefined' && typeof item.category === 'string' && item.category.trim() !== '' && // Check for existence, type, and value
+                                             typeof item.note !== 'undefined' // Check for existence
+                                          );
+                              if(validExpenses.length !== importedData.expenses.length) {
+                                  console.warn(`Filtered out ${importedData.expenses.length - validExpenses.length} invalid expense entries during import validation.`);
+                              }
+                              console.log(`Found ${validExpenses.length} valid expenses.`); // Added log
+
+
+                             const validCustomCategories = importedData.customCategories ? importedData.customCategories.filter(cat => cat && typeof cat === 'string' && cat.trim() !== '') : [];
+                             if(importedData.customCategories && validCustomCategories.length !== importedData.customCategories.length) {
+                                  console.warn(`Filtered out ${importedData.customCategories.length - validCustomCategories.length} invalid custom category entries during import validation.`);
+                             }
+                             console.log(`Found ${validCustomCategories.length} valid custom categories.`); // Added log
+
+
+                             expenses = validExpenses; // Replace current expense data
+                             customCategories = validCustomCategories; // Replace custom categories
+
+                             saveExpensesToLocalStorage(); // Save imported expense data
+                             saveCustomCategories(); // Save imported custom category data
+
+                             // After import, re-populate years dropdown (as new years might be imported)
+                             populateYearDropdown();
+
+                             // Reload categories (populates select + calls applyLanguage)
+                             loadCustomCategories(); // applyLanguage inside loads cats and triggers re-render
+
+                             // Set filter to show the current month/year after import, then update display
+                             const today = new Date();
+                             const currentMonth = today.getMonth().toString(); // 0-indexed
+                             const currentYear = today.getFullYear().toString();
+
+                              // Try to set the dropdowns to the current month and year
+                             if (filterMonthSelect && Array.from(filterMonthSelect.options).some(opt => opt.value === currentMonth)) {
+                                  filterMonthSelect.value = currentMonth;
+                             } else if (filterMonthSelect) {
+                                  filterMonthSelect.value = 'all'; // Fallback to 'All'
+                             }
+
+                             if (filterYearSelect && Array.from(filterYearSelect.options).some(opt => opt.value === currentYear)) {
+                                 filterYearSelect.value = currentYear;
+                             } else if (filterYearSelect) {
+                                 filterYearSelect.value = 'all'; // Fallback to 'All'
+                             }
+
+                             // Explicitly update the display after setting filters
+                             updateDisplayedData();
+
+
+                             alert(translations[currentLang]?.importSuccess || translations.en.importSuccess || 'Data successfully imported.');
+                             console.log("Import successful."); // Added log
+
+                         } else {
+                             console.error('Import failed: Invalid data structure.', importedData); // Improved error log
+                             alert(translations[currentLang]?.importInvalidData || translations.en.importInvalidData || 'Invalid data file format.');
+                         }
+
+                     } catch (e) {
+                         console.error('Import failed: Error processing file.', e); // Improved error log
+                         alert(translations[currentLang]?.importError || translations.en.importError || 'Error processing file. Please check the format.');
+                     }
+                 };
+
+                 reader.onerror = (error) => {
+                     console.error('File reading failed:', error); // Improved error log
+                     alert(translations[currentLang]?.importError || translations.en.importError || 'Error reading file.');
+                 };
+
+                 if (importFile && file) reader.readAsText(file); // Read the file as text, add check for file exists
+                 else if (importFile) console.warn("Import called without a file."); // Added log
+                 else console.error("importFile element not found.");
+             }
+
+
+            function clearData() {
+                console.log("Clearing data..."); // Added log
+                hideDataActionsMenu(); // Hide the menu
+                // Use translation for confirmation
+                if (confirm(translations[currentLang]?.confirmClear || translations.en.confirmClear || 'Are you sure you want to clear all data?')) {
+                    try {
+                        console.log("Confirmation received. Proceeding with clear."); // Added log
+                        expenses = []; // Empty the expenses array
+
+                        // Decide if clearing expenses should also clear custom categories.
+                        // Keeping custom categories might be useful. Let's keep them for now.
+                        // If you want to clear custom categories too, uncomment the line below:
+                        // customCategories = [];
+                        // saveCustomCategories(); // Save empty custom categories if cleared
+
+                        localStorage.removeItem('expenses'); // Remove expenses from Local Storage
+                        // If clearing custom categories, uncomment this line:
+                        // localStorage.removeItem('customCategories');
+                        console.log("Expenses removed from Local Storage."); // Added log
+
+                        // After clearing, re-populate years dropdown (as all expense years are gone)
+                        populateYearDropdown();
+                         // Reset filter to current month/year or 'All' if preferred
+                         const today = new Date();
+                         const currentMonth = today.getMonth().toString(); // 0-indexed
+                         const currentYear = today.getFullYear().toString();
+
+                         if (filterMonthSelect) filterMonthSelect.value = currentMonth;
+                         if (filterYearSelect) filterYearSelect.value = currentYear;
+                         // The change listeners below will be fired... or call explicitly
+
+
+                        updateDisplayedData(); // Update display (will show empty table/totals)
+
+                        alert(translations[currentLang]?.dataCleared || translations.en.dataCleared || 'All data has been cleared.');
+                         console.log("Data cleared successfully."); // Added log
+
+                    } catch (e) {
+                         console.error('Error clearing data:', e); // Improved error log
+                         alert('डेटा साफ़ करते समय कोई त्रुटि हुई।'); // Fallback alert
+                    }
+                } else {
+                     console.log("Data clearing cancelled by user."); // Added log
+                }
+            }
+
+            // Function to handle adding a new category via prompt
+            function handleAddCategory() {
+                 console.log("Add category icon clicked."); // Added log
+                 // Use the prompt translation for the current language
+                 const newCategoryName = prompt(translations[currentLang]?.promptNewCategory || translations.en.promptNewCategory || 'Enter new category name:');
+
+                 if (newCategoryName === null) { // User cancelled the prompt
+                     console.log("Add category prompt cancelled."); // Added log
+                     return;
+                 }
+
+                 const trimmedCategoryName = newCategoryName.trim();
+
+                 if (trimmedCategoryName === '') {
+                     // Use the invalid category translation for the current language
+                     alert(translations[currentLang]?.alertCategoryInvalid || translations.en.alertCategoryInvalid || 'Category name cannot be empty.');
+                      console.warn("Add category failed: Empty name entered."); // Added log
+                     return;
+                 }
+                 console.log(`Attempting to add new category: "${trimmedCategoryName}"`); // Added log
+
+
+                 // Add the new category to the select dropdown and array
+                 // addCategoryToSelect checks for duplicates internally
+                 const addedOption = addCategoryToSelect(trimmedCategoryName);
+
+                 if (addedOption) {
+                     // Only proceed if the category was actually added (wasn't a duplicate)
+                     // Select the newly added category
+                     if (categorySelect) categorySelect.value = trimmedCategoryName;
+
+
+                     // Save the updated list of custom categories
+                     saveCustomCategories();
+                     console.log('New category added successfully:', trimmedCategoryName); // Added log
+                     // No need to re-render table or totals here, as adding category
+                     // doesn't change existing expenses or totals until a new expense is added with it.
+
+                 } else {
+                     // If addCategoryToSelect returned null, it was a duplicate
+                     // Use the category exists translation for the current language
+                      alert(translations[currentLang]?.alertCategoryExists || translations.en.alertCategoryExists || 'This category already exists.');
+                       console.warn(`Add category failed: "${trimmedCategoryName}" already exists.`); // Added log
+                 }
+            }
+
+            // --- Filter Functions ---
+
+            // Populate Month dropdown (0-indexed values, translated text)
+            function populateMonthDropdown(lang = currentLang) {
+                 if (!filterMonthSelect || !translations[lang]?.monthNames || !translations[lang]?.filterOptionAll) { // Added filterOptionAll check
+                     console.error("Month select element or required month/filter names translation missing.");
+                     return;
+                 }
+
+                 filterMonthSelect.innerHTML = ''; // Clear existing options
+
+                 // Add "All" option
+                 const allOption = document.createElement('option');
+                 allOption.value = 'all';
+                 allOption.textContent = translations[lang].filterOptionAll; // Use translation
+                 filterMonthSelect.appendChild(allOption);
+
+                 // Add month options (0-11)
+                 for (let i = 0; i < 12; i++) {
+                     const option = document.createElement('option');
+                     option.value = i.toString(); // Use string value for consistency
+                     option.textContent = translations[lang].monthNames[i] || `Month ${i + 1}`; // Use translation
+                     filterMonthSelect.appendChild(option);
+                 }
+                 console.log("Month dropdown populated."); // Added log
+            }
+
+            // Populate Year dropdown based on expense data
+            function populateYearDropdown() {
+                if (!filterYearSelect || !translations[currentLang]?.filterOptionAll) { // Added filterOptionAll check
+                    console.error("Year select element or filter option translation missing.");
+                    return;
+                }
+
+                filterYearSelect.innerHTML = ''; // Clear existing options
+
+                // Add "All" option
+                 const allOption = document.createElement('option');
+                 allOption.value = 'all';
+                 allOption.textContent = translations[currentLang].filterOptionAll; // Use translation
+                 filterYearSelect.appendChild(allOption);
+
+                // Get unique years from expenses
+                const years = new Set();
+                expenses.forEach(expense => {
+                    try {
+                        const date = new Date(expense.dateTime);
+                         if (!isNaN(date.getTime())) { // Check if date is valid
+                            years.add(date.getFullYear());
+                         } else {
+                             console.warn("Skipping invalid date during year population:", expense.dateTime); // Added log
+                         }
+                    } catch (e) {
+                        console.error("Error processing date during year population:", expense.dateTime, e); // Added log
+                        // Continue even if one date is bad
+                    }
+                });
+
+                // Sort years descending
+                const sortedYears = Array.from(years).sort((a, b) => b - a);
+
+                // Add year options
+                sortedYears.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year.toString(); // Use string value
+                    option.textContent = year.toString();
+                    filterYearSelect.appendChild(option);
+                });
+                console.log("Year dropdown populated with years:", sortedYears); // Added log
+
+            }
+
+            // Filter expenses based on selected month and year
+            function filterExpensesByMonthYear(allExpenses, month, year) {
+                console.log(`Filtering expenses for Month: ${month}, Year: ${year}`); // Added log
+                 if (month === 'all' && year === 'all') {
+                     console.log("Filter is 'All', returning all expenses."); // Added log
+                     return allExpenses; // Return all expenses if both are 'all'
+                 }
+
+                 const filtered = allExpenses.filter(expense => {
+                     try {
+                         // Ensure dateString exists and is a string before parsing
+                         const dateString = expense && typeof expense.dateTime === 'string' ? expense.dateTime : null;
+                         if (!dateString) {
+                             console.warn("Skipping expense with missing or invalid dateString during filtering:", expense);
+                             return false; // Exclude expenses with missing date strings
+                         }
+                         const date = new Date(dateString);
+
+                         if (isNaN(date.getTime())) {
+                             console.warn("Skipping expense with invalid date during filtering:", expense);
+                             return false; // Exclude expenses with invalid dates
+                         }
+
+                         const expenseMonth = date.getMonth().toString(); // 0-indexed month as string
+                         const expenseYear = date.getFullYear().toString(); // Full year as string
+
+                         const monthMatch = (month === 'all' || expenseMonth === month);
+                         const yearMatch = (year === 'all' || expenseYear === year);
+
+                         return monthMatch && yearMatch;
+
+                     } catch (e) {
+                         console.error("Error filtering expense:", expense, e); // Log errors during filtering
+                         return false; // Exclude on error
+                     }
+                 });
+                 console.log(`Filtered down to ${filtered.length} expenses.`); // Added log
+                 return filtered;
+            }
+
+            // Update displayed table and totals based on current filter selection
+            function updateDisplayedData() {
+                console.log("Updating displayed data..."); // Added log
+                 // Get current selections from dropdowns
+                 if (!filterMonthSelect || !filterYearSelect) {
+                     console.error("Filter select elements not found for updating display.");
+                     return; // Prevent error
+                 }
+                 selectedMonth = filterMonthSelect.value;
+                 selectedYear = filterYearSelect.value;
+                 console.log(`Current filter selection: Month=${selectedMonth}, Year=${selectedYear}`); // Added log
+
+
+                 // Filter the global expenses array
+                 const filteredExpenses = filterExpensesByMonthYear(expenses, selectedMonth, selectedYear);
+
+                 // Render table and totals with filtered data
+                 renderExpenseTable(filteredExpenses);
+                 renderCategoryTotals(filteredExpenses);
+                 console.log("Displayed data updated."); // Added log
+            }
+
+            // --- Menu Functions ---
+             function toggleDataActionsMenu() {
+                 if (dataActionsMenu) {
+                     dataActionsMenu.classList.toggle('show-menu');
+                     console.log(`Data actions menu toggled. Is now visible: ${dataActionsMenu.classList.contains('show-menu')}`);
+                 } else {
+                     console.error("Data actions menu element not found.");
+                 }
+             }
+
+             function hideDataActionsMenu() {
+                 if (dataActionsMenu && dataActionsMenu.classList.contains('show-menu')) {
+                     dataActionsMenu.classList.remove('show-menu');
+                     console.log("Data actions menu hidden.");
+                 }
+             }
+
+             // Function to handle clicks outside the menu to close it
+             function handleClickOutsideMenu(event) {
+                 // Check if the menu is visible
+                 if (dataActionsMenu && dataActionsMenu.classList.contains('show-menu')) {
+                     // Check if the click was outside the menu AND outside the options icon
+                     const isClickInsideMenu = dataActionsMenu.contains(event.target);
+                     const isClickOnOptionsIcon = optionsIcon && optionsIcon.contains(event.target);
+
+                     if (!isClickInsideMenu && !isClickOnOptionsIcon) {
+                         hideDataActionsMenu();
+                     }
+                 }
+             }
+
+
+            // --- Initial Load & Setup ---
+            // This block runs when the DOM is fully loaded
+
+            console.log("Starting initial load & setup..."); // Added log
+
+            // 1. Apply mode based on saved preference
+            applyMode(localStorage.getItem('expenseTrackerMode') || 'light');
+            console.log("Mode applied."); // Added log
+
+            // 2. Determine initial language and set global variable.
+            //    applyLanguage will be called AFTER categories are loaded.
+            let initialLang = localStorage.getItem('expenseTrackerLang') || 'hi';
+            currentLang = initialLang; // Set global language variable early
+            console.log(`Initial language variable set to: ${currentLang}`); // Added log
+
+
+            // 3. Load custom categories from storage and populate the select box options.
+            //    This must happen BEFORE applying language to options or loading expenses.
+            loadCustomCategories(); // This populates categorySelect with custom options
+            console.log("Custom categories loaded and added to select (applyLanguage will translate predefined)."); // Added log
+
+
+             // 4. Load expense data from storage
+             expenses = loadExpensesFromLocalStorage(); // expenses array is populated here
+             console.log("Expense data loaded."); // Added log
+
+            // 5. Populate the Year dropdown based on the loaded expense data
+             populateYearDropdown();
+             console.log("Year dropdown populated."); // Added log
+
+
+            // 6. Populate the Month dropdown (needs current language, which is set by applyLanguage)
+            //    applyLanguage is called next, and it calls populateMonthDropdown.
+
+
+            // 7. Apply language now that all options are in the select box AND expenses are loaded.
+            //    applyLanguage will trigger populateMonthDropdown and set up initial display.
+             applyLanguage(currentLang); // applyLanguage now triggers renderTable and renderCategoryTotals with current filter
+
+
+             // 8. Set initial filter selections to current month/year AND THEN explicitly update display
+             console.log("Setting initial filter to current month/year..."); // Added log
+             const today = new Date();
+             const currentMonth = today.getMonth().toString(); // 0-indexed
+             const currentYear = today.getFullYear().toString();
+
+             // Try to set the dropdowns to the current month and year
+             if (filterMonthSelect && Array.from(filterMonthSelect.options).some(opt => opt.value === currentMonth)) {
+                  filterMonthSelect.value = currentMonth;
+                  console.log(`Initial month filter set to current: ${currentMonth}`); // Added log
+             } else if (filterMonthSelect) {
+                  // Fallback if current month option is not available (shouldn't happen with populateMonthDropdown)
+                  filterMonthSelect.value = 'all';
+                  console.warn(`Current month ${currentMonth} option not found. Initial month filter set to 'all'.`); // Added log
+             }
+
+             // Ensure the current year exists in the year dropdown options before setting
+             if (filterYearSelect && Array.from(filterYearSelect.options).some(opt => opt.value === currentYear)) {
+                 filterYearSelect.value = currentYear;
+                  console.log(`Initial year filter set to current: ${currentYear}`); // Added log
+             } else if (filterYearSelect) {
+                 // If current year is not in the list (e.g., no expenses yet, or data is very old)
+                 // Default to 'all' or the most recent year in the list if available.
+                 const firstYearOption = filterYearSelect.querySelector('option[value="all"]'); // 'All' option
+                 if (firstYearOption) {
+                     filterYearSelect.value = 'all'; // Default to 'All' if current year not found
+                     console.warn(`Current year ${currentYear} option not found in data. Initial year filter set to 'all'.`); // Added log
+                 } else {
+                      // If for some reason 'All' is not there, try setting to the first year available (usually most recent)
+                      if (filterYearSelect.options.length > 0) {
+                          filterYearSelect.value = filterYearSelect.options[0].value; // Likely 'all' or the first year
+                          console.warn(`Current year ${currentYear} and 'all' option not found. Initial year filter set to first option value: ${filterYearSelect.value}.`); // Added log
+                      } else {
+                          console.error("Year dropdown has no options to set default filter."); // Added error log
+                      }
+                 }
+             }
+
+
+             // Explicitly call updateDisplayedData AFTER setting the filter dropdown values
+             // This ensures the initial render is based on the current month/year filter.
+             updateDisplayedData();
+             console.log("Initial display updated based on current month/year filter."); // Added log
+
+
+            // 9. Attach event listeners for main interactions (icons, form submit)
+            //    Delete button listeners are attached in addExpenseRowToTable (called by renderTable)
+            console.log("Attaching event listeners..."); // Added log
+
+            // Add null/undefined checks before attaching listeners, just in case
+            if(modeToggle) modeToggle.addEventListener('click', () => {
+                const newMode = currentMode === 'light' ? 'dark' : 'light';
+                applyMode(newMode);
+            }); else console.warn("modeToggle element not found, listener not attached.");
+
+            if(langToggle) langToggle.addEventListener('click', () => {
+                const newLang = currentLang === 'hi' ? 'en' : 'hi';
+                applyLanguage(newLang); // applyLanguage now re-renders table and totals via updateDisplayedData
+            }); else console.warn("langToggle element not found, listener not attached.");
+
+            // Event listeners for the new Options menu icon
+            if(optionsIcon) optionsIcon.addEventListener('click', toggleDataActionsMenu); else console.warn("optionsIcon element not found, listener not attached.");
+            // Add global listener to close menu when clicking outside
+            document.addEventListener('click', handleClickOutsideMenu); // Added click listener for entire document
+
+
+            // Event listeners for the menu items themselves
+             if(importMenuItem) importMenuItem.addEventListener('click', () => { if(importFile) importFile.click(); else console.warn("importFile element not found, cannot trigger import."); }); else console.warn("importMenuItem element not found, listener not attached.");
+             if(exportMenuItem) exportMenuItem.addEventListener('click', exportData); else console.warn("exportMenuItem element not found, listener not attached.");
+             if(clearMenuItem) clearMenuItem.addEventListener('click', clearData); else console.warn("clearMenuItem element not found, listener not attached.");
+
+
+            // Event listener for the hidden file input after a file is selected
+            // Attach only if importFile element exists
+            if(importFile) importFile.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                importData(file);
+                 // Clear the file input so the same file can be imported again
+                 event.target.value = null;
+            }); else console.warn("importFile element not found, change listener not attached.");
+
+            // Event listeners for Filter dropdowns
+            // These will trigger updateDisplayedData whenever the selection changes
+             if(filterMonthSelect) filterMonthSelect.addEventListener('change', updateDisplayedData); else console.warn("filterMonthSelect element not found, change listener not attached.");
+             if(filterYearSelect) filterYearSelect.addEventListener('change', updateDisplayedData); else console.warn("filterYearSelect element not found, change listener not attached.");
+
+
+            // Form submit event listener
+            // Attach only if expenseForm element exists
+            if(expenseForm) expenseForm.addEventListener('submit', function(event) {
+                console.log("Form submitted."); // Added log
+                event.preventDefault();
+
+                const itemInput = document.getElementById('item');
+                const amountInput = document.getElementById('amount');
+                const noteInput = document.getElementById('note'); // Get note input reference
+
+                // Add null checks for inputs
+                const item = itemInput?.value.trim(); // Use optional chaining for safety
+                const amountValue = amountInput?.value; // Use optional chaining
+                const amount = parseFloat(amountValue); // Parse it
+                const category = categorySelect?.value; // Use optional chaining
+                const note = noteInput?.value.trim() || ''; // Use optional chaining, default to empty string
+
+
+                // Basic Validation
+                if (!item) { // Check for null/undefined/empty
+                     // Use translation for item empty alert
+                     alert(translations[currentLang]?.alertItemEmpty || translations.en.alertItemEmpty || 'Please enter item description.');
+                     console.warn("Form validation failed: Item empty or element not found."); // Added log
+                     if(itemInput) itemInput.focus(); // Set focus to the empty field
+                     return;
+                }
+                 // Check amountInput element exists AND value is not empty AND is a valid positive number
+                if (!amountInput || amountValue === '' || isNaN(amount) || amount <= 0) {
+                     // Use translation for amount invalid alert
+                    alert(translations[currentLang]?.alertAmountInvalid || translations.en.alertAmountInvalid || 'Please enter a valid amount (a positive number).');
+                    console.warn("Form validation failed: Invalid amount.", amountValue); // Added log
+                    if(amountInput) amountInput.focus(); // Set focus to the amount field
+                    return;
+                }
+                 if (!categorySelect || !category) { // categorySelect itself exists AND value is not empty ("")
+                      // Use translation for category empty alert
+                      alert(translations[currentLang]?.alertCategoryEmpty || translations.en.alertCategoryEmpty || 'Please select a category.');
+                      console.warn("Form validation failed: Category not selected or element not found."); // Added log
+                      if(categorySelect) categorySelect.focus(); // Set focus to the category field
+                      return;
+                 }
+
+                console.log("Form validation passed. Creating new expense object."); // Added log
+
+                const now = new Date();
+                const dateTimeString = formatDateTime(now); // Use current time for new entry
+
+                // Generate a more robust unique ID
+                const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+
+                // Create expense object
+                const newExpense = {
+                    id: uniqueId, // Use the generated ID
+                    dateTime: dateTimeString,
+                    item: item,
+                    amount: amount, // Store as number
+                    category: category, // Store the selected category value (language-neutral or manual name)
+                    note: note
+                };
+                console.log("New expense object:", newExpense); // Added log
+
+
+                // Add expense to the expenses array (global array)
+                expenses.push(newExpense);
+                 console.log("Expense added to global array.", expenses); // Added log
+
+
+                // Sort expenses array by date/time descending (newest first)
+                 expenses.sort((a, b) => {
+                     // Add basic validation for date objects during sort
+                     const dateA = a && typeof a.dateTime === 'string' ? new Date(a.dateTime) : null;
+                     const dateB = b && typeof b.dateTime === 'string' ? new Date(b.dateTime) : null;
+
+                      if (!dateA && !dateB) return 0; // Both invalid
+                      if (!dateA) return 1; // a is invalid, b comes first
+                      if (!dateB) return -1; // b is invalid, a comes first
+
+                     return dateB.getTime() - dateA.getTime(); // Standard sort using time values
+                 });
+                 console.log("Global expenses array sorted after add."); // Added log
+
+
+                 // Save updated global array to Local Storage
+                 saveExpensesToLocalStorage();
+                 console.log("Expenses saved to Local Storage after add."); // Added log
+
+                 // After adding, the year dropdown might need updating if it's a new year
+                 // Also, the new expense's month/year might not be the currently selected filter month/year.
+                 populateYearDropdown(); // Re-populate years just in case
+
+
+                 // Update display based on the current filter (includes the new expense if it matches)
+                 // We might want to automatically switch the filter to the month/year of the NEW expense?
+                 // For now, let's keep the current filter and just update the display.
+                 // If the new expense is in the *currently selected* month/year, it will appear.
+                 // If not, the list won't change, but the new expense is saved and will appear when that month is selected.
+                 updateDisplayedData();
+                 console.log("Displayed data updated after add."); // Added log
+
+
+                // Clear form and set default category
+                if(expenseForm) expenseForm.reset();
+                // Set default category using its language-neutral value
+                if (categorySelect) { // Add check for categorySelect
+                    categorySelect.value = 'grocery'; // Set default to grocery
+                     // Optional check/fallback if 'grocery' somehow isn't available
+                     const groceryOption = categorySelect.querySelector('option[data-key="catGrocery"]');
+                     if(groceryOption) {
+                         categorySelect.value = groceryOption.value;
+                     } else {
+                         // Fallback to the default placeholder if grocery isn't found
+                         categorySelect.value = "";
+                     }
+                } else {
+                     console.warn("categorySelect not found during form reset."); // Added log
+                }
+                 // Clear other input fields explicitly if needed (reset() should handle this)
+                 // if(itemInput) itemInput.value = '';
+                 // if(amountInput) amountInput.value = '';
+                 // if(noteInput) noteInput.value = '';
+
+
+                 console.log("Form reset to default."); // Added log
+
+            }); else console.warn("expenseForm element not found, submit listener not attached.");
+
+
+            console.log("Initial event listeners attachment attempt complete."); // Added log
+            console.log("--- Script finished initialization ---"); // Added log
+
+        }); // End DOMContentLoaded
+        console.log("--- End of script file ---"); // Added log
+
+    </script>
+
+</body>
+</html>
